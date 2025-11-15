@@ -1,0 +1,23 @@
+{
+  "name": "MBPS Rehab Estimator",
+  "short_name": "Rehab Estimator",
+  "description": "Local-first rehab estimator with custom material & labor database for MBPS.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020617",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "icons/mbps-rehab-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/mbps-rehab-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
