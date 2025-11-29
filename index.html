@@ -39,7 +39,7 @@
           <h2 class="text-sm font-semibold tracking-wide text-slate-200 uppercase">Material &amp; Labor Library</h2>
           <button id="reset-library"
                   class="text-xs px-3 py-1 rounded-full border border-red-500/70 text-red-300 hover:bg-red-500/10">
-            Reset Library
+            Reset to MBPS Defaults
           </button>
         </div>
 
@@ -192,7 +192,8 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'mbpsMaterialLibraryV1';
+    // Bump the storage key so this version loads fresh MBPS defaults
+    const STORAGE_KEY = 'mbpsMaterialLibraryV2';
 
     let materialLibrary = [];
     let calcLines = [];
@@ -223,6 +224,177 @@
     const exportJsonBtn = document.getElementById('export-json');
     const importJsonBtn = document.getElementById('import-json');
 
+    // ---- Default MBPS Library (Locked Core Items) ----
+    function getDefaultLibrary() {
+      return [
+        {
+          id: crypto.randomUUID(),
+          name: 'LVP Flooring',
+          category: 'Flooring',
+          unit: 'sqft',
+          materialCost: 5.00,
+          laborCost: 3.00,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Interior Paint',
+          category: 'Interior',
+          unit: 'sqft',
+          materialCost: 0.95,
+          laborCost: 1.85,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Window Replacement',
+          category: 'Exterior',
+          unit: 'each',
+          materialCost: 550.00,
+          laborCost: 150.00,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Roof',
+          category: 'Roof',
+          unit: 'sqft',
+          materialCost: 5.00,
+          laborCost: 3.00,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Kitchen Cabinets',
+          category: 'Kitchen',
+          unit: 'lf',
+          materialCost: 300.00,
+          laborCost: 75.00,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Full Electrical Upgrade',
+          category: 'Electrical',
+          unit: 'sqft',
+          materialCost: 4.00,
+          laborCost: 6.00,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Full Kitchen Upgrade Low End',
+          category: 'Full Kitchen',
+          unit: 'sqft',
+          materialCost: 75.00,
+          laborCost: 65.00,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Full Kitchen Upgrade Mid-Range',
+          category: 'Kitchen',
+          unit: 'sqft',
+          materialCost: 150.00,
+          laborCost: 115.00,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Full Kitchen Upgrade High End',
+          category: 'Kitchen',
+          unit: 'sqft',
+          materialCost: 225.00,
+          laborCost: 150.00,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Plumbing Upgrade',
+          category: 'Plumbing',
+          unit: 'sqft',
+          materialCost: 4.25,
+          laborCost: 5.75,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Fence',
+          category: 'Fence',
+          unit: 'lf',
+          materialCost: 13.00,
+          laborCost: 12.00,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Vinyl Siding',
+          category: 'Exterior',
+          unit: 'sqft',
+          materialCost: 4.25,
+          laborCost: 3.25,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Deck',
+          category: 'Deck',
+          unit: 'sqft',
+          materialCost: 20.00,
+          laborCost: 22.00,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Exterior Paint',
+          category: 'Exterior',
+          unit: 'sqft',
+          materialCost: 0.80,
+          laborCost: 1.70,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Carpet',
+          category: 'Carpet',
+          unit: 'sqft',
+          materialCost: 1.75,
+          laborCost: 1.25,
+          active: true,
+          core: true
+        },
+        {
+          id: crypto.randomUUID(),
+          name: 'Tile',
+          category: 'Tile',
+          unit: 'sqft',
+          materialCost: 5.50,
+          laborCost: 6.50,
+          active: true,
+          core: true
+        }
+      ];
+    }
+
+    function isCoreItem(itemId) {
+      const item = materialLibrary.find(m => m.id === itemId);
+      return !!(item && item.core);
+    }
+
     // ---- Storage helpers ----
     function loadLibrary() {
       try {
@@ -230,7 +402,21 @@
         if (!raw) {
           materialLibrary = getDefaultLibrary();
         } else {
-          materialLibrary = JSON.parse(raw);
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length) {
+            materialLibrary = parsed.map(item => ({
+              id: item.id || crypto.randomUUID(),
+              name: item.name || 'Unnamed',
+              category: item.category || '',
+              unit: item.unit || 'sqft',
+              materialCost: Number(item.materialCost || 0),
+              laborCost: Number(item.laborCost || 0),
+              active: item.active !== false,
+              core: item.core === true // preserve core flag if present
+            }));
+          } else {
+            materialLibrary = getDefaultLibrary();
+          }
         }
       } catch (e) {
         console.error('Failed to load library', e);
@@ -246,38 +432,6 @@
       renderCalcMaterialOptions();
     }
 
-    function getDefaultLibrary() {
-      return [
-        {
-          id: crypto.randomUUID(),
-          name: 'LVP Flooring',
-          category: 'Flooring',
-          unit: 'sqft',
-          materialCost: 2.25,
-          laborCost: 2.00,
-          active: true
-        },
-        {
-          id: crypto.randomUUID(),
-          name: 'Interior Paint',
-          category: 'Interior',
-          unit: 'sqft',
-          materialCost: 0.75,
-          laborCost: 1.25,
-          active: true
-        },
-        {
-          id: crypto.randomUUID(),
-          name: 'Window Replacement',
-          category: 'Exterior',
-          unit: 'each',
-          materialCost: 250,
-          laborCost: 150,
-          active: true
-        }
-      ];
-    }
-
     // ---- Library UI ----
     function renderLibrary() {
       libraryListEl.innerHTML = '';
@@ -291,6 +445,28 @@
         const card = document.createElement('div');
         card.className = 'bg-slate-950/80 border border-slate-800 rounded-xl p-3 flex justify-between gap-2 text-xs';
 
+        const statusBadge = `
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full ${
+            item.active
+              ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/40'
+              : 'bg-slate-700/60 text-slate-300 border border-slate-600'
+          }">
+            ${item.active ? 'Active' : 'Inactive'}
+          </span>
+          ${item.core ? '<span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-300 border border-sky-500/40">Core</span>' : ''}
+        `;
+
+        const actionsHtml = item.core
+          ? `<span class="text-[0.65rem] text-slate-500">Core item</span>`
+          : `
+            <button data-id="${item.id}" class="edit-btn text-[0.65rem] px-2 py-1 rounded-full border border-slate-700 hover:bg-slate-800/90">
+              Edit
+            </button>
+            <button data-id="${item.id}" class="delete-btn text-[0.65rem] px-2 py-1 rounded-full border border-red-500/60 text-red-300 hover:bg-red-500/10">
+              Delete
+            </button>
+          `;
+
         card.innerHTML = `
           <div class="space-y-0.5">
             <div class="font-semibold text-slate-100">${item.name}</div>
@@ -301,27 +477,18 @@
               Material: $${item.materialCost.toFixed(2)} / ${item.unit} · Labor: $${item.laborCost.toFixed(2)} / ${item.unit}
             </div>
             <div class="text-[0.65rem] mt-0.5">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full ${
-                item.active ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/40' : 'bg-slate-700/60 text-slate-300 border border-slate-600'
-              }">
-                ${item.active ? 'Active' : 'Inactive'}
-              </span>
+              ${statusBadge}
             </div>
           </div>
           <div class="flex flex-col items-end justify-between gap-1">
-            <button data-id="${item.id}" class="edit-btn text-[0.65rem] px-2 py-1 rounded-full border border-slate-700 hover:bg-slate-800/90">
-              Edit
-            </button>
-            <button data-id="${item.id}" class="delete-btn text-[0.65rem] px-2 py-1 rounded-full border border-red-500/60 text-red-300 hover:bg-red-500/10">
-              Delete
-            </button>
+            ${actionsHtml}
           </div>
         `;
 
         libraryListEl.appendChild(card);
       });
 
-      // Wire up buttons
+      // Wire up buttons (core items won't have these)
       libraryListEl.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', () => startEdit(btn.dataset.id));
       });
@@ -342,6 +509,10 @@
     }
 
     function startEdit(id) {
+      if (isCoreItem(id)) {
+        alert('Core MBPS items are locked. Add a new custom item instead.');
+        return;
+      }
       const item = materialLibrary.find(m => m.id === id);
       if (!item) return;
       matNameEl.value = item.name;
@@ -355,6 +526,10 @@
     }
 
     function deleteMaterial(id) {
+      if (isCoreItem(id)) {
+        alert('Core MBPS items cannot be deleted.');
+        return;
+      }
       if (!confirm('Delete this material?')) return;
       materialLibrary = materialLibrary.filter(m => m.id !== id);
       saveLibrary();
@@ -383,14 +558,19 @@
 
       const existingId = editIdEl.value;
       if (existingId) {
-        const idx = materialLibrary.findIndex(m => m.id === existingId);
-        if (idx >= 0) {
-          materialLibrary[idx] = { ...materialLibrary[idx], ...data };
+        if (isCoreItem(existingId)) {
+          alert('Core MBPS items are locked. Add a new custom item instead.');
+        } else {
+          const idx = materialLibrary.findIndex(m => m.id === existingId);
+          if (idx >= 0) {
+            materialLibrary[idx] = { ...materialLibrary[idx], ...data };
+          }
         }
       } else {
         materialLibrary.push({
           id: crypto.randomUUID(),
-          ...data
+          ...data,
+          core: false
         });
       }
 
@@ -401,7 +581,7 @@
     clearFormBtn.addEventListener('click', clearForm);
 
     resetLibraryBtn.addEventListener('click', () => {
-      if (!confirm('This will reset to the default sample library. Continue?')) return;
+      if (!confirm('This will reset to the MBPS default cost library and clear any custom items. Continue?')) return;
       materialLibrary = getDefaultLibrary();
       saveLibrary();
       clearForm();
@@ -506,7 +686,6 @@
       try {
         const parsed = JSON.parse(jsonAreaEl.value);
         if (!Array.isArray(parsed)) throw new Error('JSON must be an array');
-        // Ensure ids exist
         materialLibrary = parsed.map(item => ({
           id: item.id || crypto.randomUUID(),
           name: item.name || 'Unnamed',
@@ -514,7 +693,8 @@
           unit: item.unit || 'sqft',
           materialCost: Number(item.materialCost || 0),
           laborCost: Number(item.laborCost || 0),
-          active: item.active !== false
+          active: item.active !== false,
+          core: item.core === true
         }));
         saveLibrary();
         calcLines = [];
