@@ -328,37 +328,40 @@
           core: true
         },
 
-         // 🚿 BATHROOM PROFILES (per bathroom)
-        {
-          id: crypto.randomUUID(),
-          name: 'Full Bathroom Remodel - Low',
-          category: 'Bathroom',
-          unit: 'room',          // per bathroom
-          materialCost: 3500.00, // tile, vanity, tub/shower, fixtures
-          laborCost: 2500.00,    // demo, install, plumbing/electrical
-          active: true,
-          core: true
-        },
-        {
-          id: crypto.randomUUID(),
-          name: 'Full Bathroom Remodel - Mid',
-          category: 'Bathroom',
-          unit: 'room',
-          materialCost: 9000.00,
-          laborCost: 6000.00,
-          active: true,
-          core: true
-        },
-        {
-          id: crypto.randomUUID(),
-          name: 'Full Bathroom Remodel - High',
-          category: 'Bathroom',
-          unit: 'room',
-          materialCost: 17000.00,
-          laborCost: 11000.00,
-          active: true,
-          core: true
-        },
+       // 🚿 BATHROOM – $/SQFT (full upgrade)
+    {
+      id: crypto.randomUUID(),
+      name: 'Full Bathroom Upgrade Low End',
+      category: 'Bathroom',
+      unit: 'sqft',
+      // e.g. 40 sqft x (125+100) = $9,000
+      materialCost: 125.00,
+      laborCost: 100.00,
+      active: true,
+      core: true
+    },
+    {
+      id: crypto.randomUUID(),
+      name: 'Full Bathroom Upgrade Mid-Range',
+      category: 'Bathroom',
+      unit: 'sqft',
+      // e.g. 40 sqft x (175+150) = $13,000
+      materialCost: 175.00,
+      laborCost: 150.00,
+      active: true,
+      core: true
+    },
+    {
+      id: crypto.randomUUID(),
+      name: 'Full Bathroom Upgrade High End',
+      category: 'Bathroom',
+      unit: 'sqft',
+      // e.g. 40 sqft x (250+200) = $18,000
+      materialCost: 250.00,
+      laborCost: 200.00,
+      active: true,
+      core: true
+    },
    
         {
           id: crypto.randomUUID(),
